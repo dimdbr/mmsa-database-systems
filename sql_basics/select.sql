@@ -62,14 +62,14 @@ INSERT INTO `order_item`(`order_id`, `item_id`, `quantity`, `discount`) VALUES
     (3, 6, 1, 0),
     (4, 5, 1, 1.49);
     
-select `first_name`,`last_name`,
-(select count(*) from `order` where `order`.person_id=person.id) as total_orders,
-(select sum(quantity) from order_item where order_item.order_id in (select id from `order` where `order`.person_id=person.id) ) as total_items_bought,
-(select  sum((item.price-order_item.discount)*order_item.quantity)
-from `order` 
-inner join order_item on `order`.id = order_item.order_id
-inner join item on item.id = order_item.item_id 
-where  `order`.person_id=person.id
-) as total_money_spent 
- from person;
+select person.first_name,person.last_name, 
+count(distinct `order`.id) as total_orders,
+sum(order_item.quantity) as total_items_bought,
+sum((item.price-order_item.discount)*order_item.quantity) as  total_money_spent
+from person
+left outer join `order` on `order`.person_id=person.id
+left outer join order_item on `order`.id = order_item.order_id
+left outer join item on item.id = order_item.item_id 
+group by person.id;
+
 
